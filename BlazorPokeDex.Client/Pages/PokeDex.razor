@@ -1,0 +1,38 @@
+﻿@page "/"
+@using BlazorPokedex.Models
+@using BlazorPokedex.Services
+@inject IPokeApiClient pokeApiClient;
+<h3>PokeDex</h3>
+@if (pokemons == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        @for (var i = 0; i < NumberOfRows; i++)
+        {
+            <div class="row">
+                @foreach (var item in pokemons.Skip(i * 6).Take(6))
+                {
+                    <div class="card pokeCard mb-4 bg-@(item.Types.FirstOrDefault()!.PokemonType.Name)">
+                        <div class="card-body">
+                            <h4>@item.Name</h4>
+                            <img src="@item.Sprites.Front" class="img-fluid" alt="@item.Name" />
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+@code {
+    IEnumerable<Pokemon> pokemons = new List<Pokemon>();
+    public int NumberOfRows { get; set; } = 5;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pokemons = await pokeApiClient.GetAllPokemons();
+    }
+
+}
